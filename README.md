@@ -1,8 +1,10 @@
 # vehicle-status-monitoring
 
-# Git Repo
-https://github.com/DeepikaCodeRepo/vehicle-status-backend.git for API
-https://github.com/DeepikaCodeRepo/VehicleStatusGUI.git For React 
+# Git Repo for API
+https://github.com/DeepikaCodeRepo/vehicle-status-backend.git 
+
+# Git Repo for front end
+https://github.com/DeepikaCodeRepo/VehicleStatusGUI.git 
 
 ## Given scenario 
 Our company has a number of connected vehicles that belongs to a number of customers.
