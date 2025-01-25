@@ -1,5 +1,9 @@
 # vehicle-status-monitoring
 
+# Git Repo
+https://github.com/DeepikaCodeRepo/vehicle-status-backend.git for API
+https://github.com/DeepikaCodeRepo/VehicleStatusGUI.git For React 
+
 ## Given scenario 
 Our company has a number of connected vehicles that belongs to a number of customers.
 We have a need to be able to view the status of the connection among these vehicles on a monitoring display.
