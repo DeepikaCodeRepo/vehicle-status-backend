@@ -1,4 +1,4 @@
-# vehicle-status-monitoring
+# Customer Vehicle Status Monitoring 
 
 # Git Repo for API
 https://github.com/DeepikaCodeRepo/vehicle-status-backend.git 
@@ -32,7 +32,7 @@ Below you have all customers from the system; their addresses and the vehicles t
 
 Save the information that you think is needed to solve the task above.
 If you feel that databases and/or database design isn't something you are comfortable with, you're welcome to store the information in an object in the code.
-
+`
 | Kalles Grustransporter AB         |
 | Cementvägen 8, 111 11 Södertälje  |
 |-----------------------------------|
@@ -60,114 +60,135 @@ If you feel that databases and/or database design isn't something you are comfor
 | YS2R4X20005387765     PQR678      |
 | YS2R4X20005387055     STU901      |
 |-----------------------------------|
+`
 
+# Vehicle Status API - Backend Overview
+This project provides a backend service for managing vehicle status information. The backend consists of a Spring Boot application that interacts with a MySQL database to store and retrieve vehicle data, statuses, and customer information.
 
-## **Project Structure**
+# Key Features
+Vehicle Management: Provides endpoints to get a list of vehicles and their status information.
+Customer Management: Provides functionality to fetch all customer data.
+Status Simulation: Simulates periodic updates of vehicle statuses (CONNECTED or DISCONNECTED).
+## Components
+### Controllers:
+VehicleController: Exposes endpoints to fetch vehicles and customers.
+Endpoints:
+GET /api/vehicles: Retrieves a list of vehicles, optionally filtered by customer.
+GET /api/customers: Retrieves a list of all customers. 
 
-## Environment
-Java 17
-Maven
+### DTO (Data Transfer Object):
+VehicleDTO: Represents vehicle data along with the latest status.
 
-### **Backend (Spring Boot)**
-- **Modules:**
-  - `controller`: Handles API requests.
-  - `service`: Business logic for vehicle management.
-  - `repository`: Interfaces for interacting with the database.
-  - `model`: Entity classes for database mapping.
-  - `dto`: Data Transfer Objects.
+### Models:
+Vehicle: Represents vehicle data, including VIN, registration number, and the associated customer.
+Customer: Represents customer data, including customer name and address.
+Status: Represents the vehicle status (e.g., CONNECTED or DISCONNECTED), along with a timestamp for when it was last updated.
+Repositories:
 
-### **Frontend (ReactJS)**
-- **Structure:**
-  - Components: Reusable components for the UI.
-  - Pages: Views rendered based on routes.
-  - Services: Axios calls to the backend.
+### Repositories
+VehicleRepository: Interface to interact with the database for vehicle-related queries.
+CustomerRepository: Interface for customer data access.
+StatusRepository: Interface for status data access, including querying the latest status for a vehicle.
+Services:
 
----
+### Services
+VehicleService: Contains business logic for retrieving vehicles and customers, and simulating vehicle statuses.
+StatusSimulationService: Simulates vehicle status updates every minute and updates the database with the latest status for each vehicle.
 
-## **Setup Instructions**
+### Simulation Logic
+Status Simulation:
+A scheduled task runs every minute to simulate random status updates for each vehicle (either "CONNECTED" or "DISCONNECTED").
+The StatusSimulationService checks for the latest status of each vehicle, updating or inserting a new status record into the database.
 
-### **Backend**
+### Vehicle and Customer Management:
 
-1. Clone the repository.
-2. Navigate to the backend directory.
-3. Update `application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/vehicle_monitoring
-   spring.datasource.username=YOUR_DB_USERNAME
-   spring.datasource.password=YOUR_DB_PASSWORD
-   spring.jpa.hibernate.ddl-auto=update
-   ```
-4. Build and run the application:
-   ```bash
-   ./mvn spring-boot:run
-   ```
-5. API Endpoints:
-   - `GET /api/vehicles`: List all vehicles with statuses.
-   - `GET /api/vehicles?customer={customerId}`: Filter by customer.
-   - `GET /api/customers`: List all customers.
-  
-# Database
-## Create table schemas
-## customer
-CREATE TABLE customer (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    address VARCHAR(255) NOT NULL
-);
+The VehicleService handles retrieving vehicles based on customer ID, or all vehicles if no ID is provided. It also fetches the latest status for each vehicle and returns the data in a VehicleDTO format.
+The VehicleController exposes endpoints to interact with the vehicle and customer data.
 
-## vehicle
-CREATE TABLE vehicle (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    vin VARCHAR(255) NOT NULL,
-    reg-number VARCHAR(255) NOT NULL,
-    customer_id BIGINT UNSIGNED NOT NULL,
-    FOREIGN KEY (customer_id) REFERENCES customer(id) ON DELETE CASCADE
-);
+### Database Configuration
+Database: MySQL
+Update `application.properties`
+spring.datasource.url=jdbc:mysql://localhost:3306/vehicle_monitoring
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
+spring.jpa.hibernate.ddl-auto=update
 
-## status
-CREATE TABLE status (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    vehicle_id BIGINT UNSIGNED NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    last-updated DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicle(id) ON DELETE CASCADE
-);
+### Create table schemas
+### customer
+`CREATE TABLE customer (
+id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(255) NOT NULL,
+address VARCHAR(255) NOT NULL
+);`
+
+### vehicle
+`CREATE TABLE vehicle (
+id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+vin VARCHAR(255) NOT NULL,
+reg-number VARCHAR(255) NOT NULL,
+customer_id BIGINT UNSIGNED NOT NULL,
+FOREIGN KEY (customer_id) REFERENCES customer(id) ON DELETE CASCADE
+);`
+
+### status
+`CREATE TABLE status (
+id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+vehicle_id BIGINT UNSIGNED NOT NULL,
+status VARCHAR(50) NOT NULL,
+last-updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (vehicle_id) REFERENCES vehicle(id) ON DELETE CASCADE
+);`
 
 ## Insert sample data for test
 
 ## Insert Customers
-INSERT INTO customer (name, address) VALUES
+`INSERT INTO customer (name, address) VALUES
 ('Kalles Grustransporter AB', 'Cementvägen 8, 111 11 Södertälje'),
 ('Johans Bulk AB', 'Balkvägen 12, 222 22 Stockholm'),
-('Haralds Värdetransporter AB', 'Budgetvägen 1, 333 33 Uppsala');
+('Haralds Värdetransporter AB', 'Budgetvägen 1, 333 33 Uppsala');`
 
 ## Insert Vehicles
-INSERT INTO vehicle (vin, reg_number, customer_id) VALUES
+`INSERT INTO vehicle (vin, reg_number, customer_id) VALUES
 ('YS2R4X20005399401', 'ABC123', 1),
 ('VLUR4X20009093588', 'DEF456', 1),
 ('VLUR4X20009048066', 'GHI789', 1),
 ('YS2R4X20005388011', 'JKL012', 2),
 ('YS2R4X20005387949', 'MNO345', 2),
 ('YS2R4X20005387765', 'PQR678', 3),
-('YS2R4X20005387055', 'STU901', 3);
+('YS2R4X20005387055', 'STU901', 3);`
 
 
 ## Insert Statuses
-INSERT INTO status (vehicle_id, status, last_updated) VALUES
+`INSERT INTO status (vehicle_id, status, last_updated) VALUES
 (1, 'Connected', NOW()),
 (2, 'Disconnected', NOW()),
 (3, 'Connected', NOW()),
 (4, 'Disconnected', NOW()),
 (5, 'Connected', NOW()),
 (6, 'Disconnected', NOW()),
-(7, 'Connected', NOW());
+(7, 'Connected', NOW());`
+
+### Technologies Used
+Spring Boot: Framework for building the backend API.
+Spring Data JPA: For database access and interaction.
+MySQL: Database for storing vehicle, customer, and status information.
+Spring Scheduling: For simulating vehicle status updates periodically.
+
+### Setup Instructions and How to Run
+Ensure you have MySQL installed and running.
+Set up the database using the vehicle_monitoring database.
+Clone the repository and build the Spring Boot application.
+Configure the database settings in application.properties.
+Run the Spring Boot application (mvn spring-boot:run or through your IDE).
+Access the API via http://localhost:8080.
 
 ## Sample test result
+### API End Points
+![customer api.png](src/main/resources/customer%20api.png)
+![vehicle API.png](src/main/resources/vehicle%20API.png)
+![customer filter API.png](src/main/resources/customer%20filter%20API.png)
 
-![Screenshot 2025-01<img width="399" alt="Screenshot 2025-01-25 at 19 57 22" src="https://github.com/user-attachments/assets/3c4cd681-d1e4-405c-98e1-0a05a7f1b47d" />
--25 at 19 56 23](https://github.com/user-attachments/assets/5aebeaf5-8742-47bc-8e81-417d63c8327d)
-
-<img width="412" alt="Screenshot 2025-01-25 at 19 55 53" src="https://github.com/user-attachments/assets/d2f473db-3774-4691-bce7-b447a1b84419" />
-
-<img widt![Screenshot 2025-01-25 at 19 55 22](https://github.com/user-attachments/assets/5b790cc2-df05-4f57-9705-e36acfe053f5)
-h="384" alt="Screenshot 2025-01-25 at 19 50 18" src="https://github.com/user-attachments/assets/342f70dc-de72-45fe-9233-ed271b29707e" />
+### DB data
+![Customer table.png](src/main/resources/Customer%20table.png)
+![vehicle table.png](src/main/resources/vehicle%20table.png)
+![status table.png](src/main/resources/status%20table.png)

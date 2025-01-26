@@ -12,8 +12,9 @@ public class Vehicle {
     private String vin;
     private String regNumber;
 
+    // Many-to-One relationship with the Customer entity, indicating that each vehicle is related to one customer
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id") // foreign key column
     private Customer customer;
 
     // Getters and Setters

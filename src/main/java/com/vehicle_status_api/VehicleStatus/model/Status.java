@@ -10,8 +10,9 @@ public class Status {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Many-to-One relationship with the Vehicle entity, for indicating  that each status is related to one vehicle
     @ManyToOne
-    @JoinColumn(name = "vehicle_id")
+    @JoinColumn(name = "vehicle_id") // foreign key
     private Vehicle vehicle;
 
     private String status;

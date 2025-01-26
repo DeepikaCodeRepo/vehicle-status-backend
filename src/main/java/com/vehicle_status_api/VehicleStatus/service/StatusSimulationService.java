@@ -13,55 +13,50 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+// The StatusSimulationService is responsible for simulating the vehicle status periodically
 @Service
 public class StatusSimulationService {
-    //private static final String[] STATUSES = {"Connected", "Disconnected"};
-    //private static final Random random = new Random();
 
+    // Injecting the VehicleRepository and StatusRepository beans into the service
     @Autowired
     private VehicleRepository vehicleRepository;
 
     @Autowired
     private StatusRepository statusRepository;
 
-    // Scheduled to run every minute
+    // Scheduled task that runs every 60 seconds (1 minute)
     @Scheduled(fixedRate = 60000)  // 60000ms = 1 minute
     public void simulateVehicleStatus() {
-        List<Vehicle> vehicles = vehicleRepository.findAll();  // Fetch all vehicles
+        // Fetching all vehicles from the database
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+
+        // Random object to simulate status
         Random random = new Random();
 
+        // Iterating over each vehicle to simulate its status
         for (Vehicle vehicle : vehicles) {
-            // Simulate random status change (either Connected or Disconnected)
-            //String status = STATUSES[random.nextInt(STATUSES.length)];
+            // Simulate random status change (either "CONNECTED" or "DISCONNECTED")
             String newStatus = random.nextBoolean() ? "CONNECTED" : "DISCONNECTED";
 
-            // Check if a status record already exists for this vehicle
+            // Checking if a status already exists for this vehicle
             Optional<Status> existingStatus = Optional.ofNullable(statusRepository.findLatestByVehicle(vehicle));
 
             if (existingStatus.isPresent()) {
-                // Update the existing status
+                // If a status exists, update the status and lastUpdated timestamp
                 Status status = existingStatus.get();
                 status.setStatus(newStatus);
                 status.setLastUpdated(LocalDateTime.now());
+                // Save the updated status into the database
                 statusRepository.save(status);
             } else {
-                // Insert a new status
+                // If no status exists, create a new status record for the vehicle
                 Status status = new Status();
-                status.setId(vehicle.getId());
-                status.setStatus(newStatus);
-                status.setLastUpdated(LocalDateTime.now());
+                status.setVehicle(vehicle);  // Set the vehicle for the status
+                status.setStatus(newStatus);  // Set the simulated status
+                status.setLastUpdated(LocalDateTime.now());  // Set the current timestamp
+                // Save the new status into the database
                 statusRepository.save(status);
             }
-
-            // Create a new Status entry for each vehicle
-            //Status newStatus = new Status();
-            //newStatus.setVehicle(vehicle);
-            //newStatus.setStatus(status);
-            //newStatus.setLastUpdated(LocalDateTime.now());
-
-            // Save the new status into the database
-            //statusRepository.save(newStatus);
         }
     }
 }
-
